@@ -1,6 +1,6 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@using System.ComponentModel.DataAnnotations
+@using Scraper.Core.Dtos
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
@@ -13,27 +13,23 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Link</th>
-                <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>
-            @if (items.Count == 0)
+            @if (sources.Count == 0)
             {
                 <tr>
-                    <td colspan="4" class="text-center text-muted">No items yet</td>
+                    <td colspan="3" class="text-center text-muted">No sources yet</td>
                 </tr>
             }
             else
             {
-                @foreach (var item in items)
+                @foreach (var s in sources)
                 {
                     <tr>
-                        <td>@item.Id</td>
-                        <td>@item.Name</td>
-                        <td>@item.Link</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-secondary">Parse</button>
-                        </td>
+                        <td>@s.Id</td>
+                        <td>@s.Name</td>
+                        <td>@s.Link</td>
                     </tr>
                 }
             }
@@ -47,16 +43,12 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">New item</h5>
+                        <h5 class="modal-title">New source</h5>
                         <button type="button" class="btn-close" @onclick="CloseModal"></button>
                     </div>
-                    <EditForm Model="model" OnValidSubmit="SaveItem">
+                    <EditForm Model="model" OnValidSubmit="SaveSource">
                         <DataAnnotationsValidator />
                         <div class="modal-body">
-                            @if (!string.IsNullOrEmpty(saveError))
-                            {
-                                <div class="alert alert-danger" role="alert">@saveError</div>
-                            }
                             <div class="mb-3">
                                 <label for="nameInput" class="form-label">Name</label>
                                 <InputText id="nameInput" class="form-control" @bind-Value="model.Name" />

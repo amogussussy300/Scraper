@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Scraper.Core/Scraper.Core.csproj" />
   <Project Path="Scraper/Scraper.csproj" />
 </Solution>
