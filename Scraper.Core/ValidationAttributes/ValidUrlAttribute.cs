@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Scraper.Core.Validation;
+namespace Scraper.Core.ValidationAttributes;
 
 public sealed class ValidUrlAttribute : ValidationAttribute
 {

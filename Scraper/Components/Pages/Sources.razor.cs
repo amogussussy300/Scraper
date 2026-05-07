@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Scraper.Core.Dtos;
 using Scraper.Core.Services;
+using Scraper.Models;
 
 namespace Scraper.Components.Pages;
 
@@ -11,7 +12,7 @@ public partial class Sources
     private List<SourceDto> sources = new();
     private bool isModalOpen;
     private bool isSaving;
-    private SourceDto model = new();
+    private SourceModel model = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -20,14 +21,14 @@ public partial class Sources
 
     private void OnAddClicked()
     {
-        model = new SourceDto();
+        model = new SourceModel();
         isModalOpen = true;
     }
 
     private void CloseModal()
     {
         isModalOpen = false;
-        model = new SourceDto();
+        model = new SourceModel();
     }
 
     private async Task SaveSource()
@@ -36,12 +37,8 @@ public partial class Sources
         isSaving = true;
         try
         {
-            var trimmed = (model.Link ?? "").Trim();
-            bool hasScheme = Uri.TryCreate(trimmed, UriKind.Absolute, out var probe)
-                             && (probe.Scheme == Uri.UriSchemeHttp || probe.Scheme == Uri.UriSchemeHttps);
-            model.Link = hasScheme ? trimmed : "https://" + trimmed;
-
-            var saved = await SourceService.AddAsync(model);
+            var dto = new SourceDto { Name = model.Name, Link = model.Link };
+            var saved = await SourceService.AddAsync(dto);
             sources.Add(saved);
             CloseModal();
         }

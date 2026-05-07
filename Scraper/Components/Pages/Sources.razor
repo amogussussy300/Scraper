@@ -1,6 +1,6 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@using Scraper.Core.Dtos
+@using Scraper.Models
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
@@ -24,13 +24,15 @@
             }
             else
             {
+                var i = 1; 
                 @foreach (var s in sources)
                 {
                     <tr>
-                        <td>@s.Id</td>
+                        <td>@i</td>
                         <td>@s.Name</td>
                         <td>@s.Link</td>
                     </tr>
+                    i++;
                 }
             }
         </tbody>

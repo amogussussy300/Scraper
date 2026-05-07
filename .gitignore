@@ -1,6 +1,9 @@
 # local environment data
 .env
 
+# local dev config
+**/appsettings.Development.json
+
 # SQLite database files
 *.db
 *.db-shm

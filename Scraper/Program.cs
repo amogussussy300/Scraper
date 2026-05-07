@@ -1,7 +1,5 @@
 using Scraper.Components;
-using Microsoft.EntityFrameworkCore;
-using Scraper.Core.Data;
-using Scraper.Core.Services;
+using Scraper.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ScraperDb")));
-
-builder.Services.AddScoped<SourceService>();
+Startup.ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
