@@ -19,37 +19,26 @@
 
 ## Workflow
 
-### 1. Clone and prepare local env file
-
+### 1. Clone and prepare local config files
 ```powershell
 git clone https://github.com/amogussussy300/Scraper.git
 cd Scraper
 git switch sources-page
 Copy-Item .env.example .env
+Copy-Item Scraper/appsettings.Development.example.json Scraper/appsettings.Development.json
 ```
+### 2. Set the password (same value in both files)
+Open .env and replace the placeholder with a password you choose.
 
-### 2. Edit `.env`
-
-Open `.env` and replace the placeholder with your own password. 
-
-### 3. Start Postgres and configure secrets
-
-```powershell
+Open Scraper/appsettings.Development.json and replace <replace-me> with the same password.
+### 3. Start Postgres
+```
 docker compose up -d
 docker ps                      # status should show (healthy)
-
-# Replace <same-as-.env> with the password you set in .env
-dotnet user-secrets set "ConnectionStrings:ScraperDb" "Host=localhost;Port=5434;Database=scraper;Username=scraper;Password=<same-as-.env>" --project Scraper
-
-# Verify
-dotnet user-secrets list --project Scraper
 ```
-
 ### 4. Apply migrations
-
-EF Core needs both projects: `--project` is where migrations live (`Scraper.Core`), `--startup-project` is where DI/config is read from (`Scraper`).
-
-```powershell
+EF Core needs both projects: --project is where migrations live (Scraper.Core), --startup-project is where DI/config is read from (Scraper).
+```
 $env:ASPNETCORE_ENVIRONMENT = "Development"
 dotnet ef database update --project Scraper.Core --startup-project Scraper
 ```
@@ -74,7 +63,7 @@ dotnet run --project Scraper
 
 ## Troubleshooting
 
-- **`28P01: password authentication failed`** — `.env` and User Secrets don't match (or volume was initialized with a different password). Fix: `docker compose down -v`, verify `.env` matches User Secrets, `docker compose up -d`, retry migration.
-- **`role "scraper" does not exist`** — your connection landed on a different Postgres on the same host port. Stop the rogue service or change the host port in `docker-compose.yml` + User Secrets.
+- **`28P01: password authentication failed`** — `.env` and `Scraper/appsettings.Development.json` don't match (or the Postgres volume was initialized with a different password). Fix: `docker compose down -v`, ensure both files have the same password, `docker compose up -d`, retry migration.
+- **`role "scraper" does not exist`** — your connection landed on a different Postgres on the same host port. Stop the rogue service or change the host port in `docker-compose.yml` + `Scraper/appsettings.Development.json`.
 - **`POSTGRES_PASSWORD must be set in .env`** — `.env` is missing, named `.env.txt`, has a typo, or has a UTF-8 BOM. Inspect with `Get-Content .env | Format-Hex`.
 - **VS shows no startup project** — open `Scraper.slnx` (File → Open → Project/Solution), not the folder.
