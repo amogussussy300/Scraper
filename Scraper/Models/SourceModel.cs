@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Scraper.Core.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
+using Scraper.ValidationAttributes;
 
 namespace Scraper.Models
 {
