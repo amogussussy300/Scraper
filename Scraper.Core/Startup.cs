@@ -12,7 +12,13 @@ namespace Scraper.Core
         {
             services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ScraperDb")));
 
+            services.AddMemoryCache();
+
             services.AddScoped<SourceService>();
+            services.AddScoped<ScrapDetailService>();
+            services.AddScoped<HtmlParserService>();
+
+            services.AddSingleton<IPlaywrightService, PlaywrightService>();
         }
     }
 }

@@ -1,0 +1,66 @@
+﻿@page "/Sources/{Id:int}"
+@rendermode InteractiveServer
+<div class="container-fluid py-4">
+    @if (source == null)
+    {
+        <div class="alert alert-warning">Source not found.</div>
+        <a href="/" class="btn btn-secondary">Back</a>
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="mb-0">@source.Name</h3>
+                <small class="text-muted">@source.Link</small>
+            </div>
+            <a href="/" class="btn btn-outline-secondary btn-sm">Back to sources</a>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Page URL (from Source.Link)</label>
+            <input class="form-control" value="@source.Link" readonly />
+        </div>
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" class="btn btn-primary" @onclick="OnCreateDetailClicked" disabled="@isCreating">
+                @(isCreating ? "Creating..." : "Create Detail")
+            </button>
+        </div>
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">ActionType</th>
+                    <th scope="col">Target</th>
+                    <th scope="col" style="width: 1%; white-space: nowrap;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (details.Count == 0)
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">No details yet</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var d in details)
+                    {
+                        <tr>
+                            <td>@d.ActionType</td>
+                            <td>@(string.IsNullOrEmpty(d.Target) ? "(not set)" : d.Target)</td>
+                            <td>
+                                <button type="button" class="btn btn-link p-0"
+                                        @onclick="() => OnEditClicked(d.Id)">
+                                    edit
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <EditDetailOverlay DetailId="editingDetailId"
+                           PageUrl="@source.Link"
+                           SourceId="source.Id"
+                           OnClose="OnOverlayClosed"
+                           OnSaved="OnOverlaySaved" />
+    }
+</div>

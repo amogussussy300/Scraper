@@ -1,6 +1,5 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@using Scraper.Models
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
@@ -25,13 +24,15 @@
                     Name <i class="bi @SortIcon("Name")"></i></th>
                 <th scope="col" style="cursor:pointer; user-select:none" @onclick='() => OnSortClicked("Link")'>
                     Link <i class="bi @SortIcon("Link")"></i></th>
+                <th scope="col" style="width: 1%; white-space: nowrap;">Action</th>
+                <th scope="col" style="width: 1%; white-space: nowrap;">Delete</th>
             </tr>
         </thead>
         <tbody>
             @if (sources.Count == 0)
             {
                 <tr>
-                    <td colspan="2" class="text-center text-muted">No sources yet</td>
+                    <td colspan="4" class="text-center text-muted">No sources yet</td>
                 </tr>
             }
             else
@@ -41,6 +42,8 @@
                     <tr>
                         <td>@s.Name</td>
                         <td>@s.Link</td>
+                        <td><a href="@($"/Sources/{s.Id}")">edit</a></td>
+                        <td><button type="button" class="btn btn-danger" @onclick="() => OnDeleteClicked(s.Id)">Delete</button></td>
                     </tr>
                 }
             }
