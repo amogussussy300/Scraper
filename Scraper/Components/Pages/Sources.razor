@@ -24,15 +24,13 @@
                     Name <i class="bi @SortIcon("Name")"></i></th>
                 <th scope="col" style="cursor:pointer; user-select:none" @onclick='() => OnSortClicked("Link")'>
                     Link <i class="bi @SortIcon("Link")"></i></th>
-                <th scope="col" style="width: 1%; white-space: nowrap;">Action</th>
-                <th scope="col" style="width: 1%; white-space: nowrap;">Delete</th>
             </tr>
         </thead>
         <tbody>
             @if (sources.Count == 0)
             {
                 <tr>
-                    <td colspan="4" class="text-center text-muted">No sources yet</td>
+                    <td colspan="2" class="text-center text-muted">No sources yet</td>
                 </tr>
             }
             else
@@ -56,7 +54,7 @@
             @for (int p = 1; p <= totalPages; p++)
             {
                 var pageNum = p;
-                <button class="btn @(pageNum == currentPage ? "btn-primary" : "btn-outline-primary") btn-sm mx-1"
+                <button class="btn @(pageNum == PagingParams.Page ? "btn-primary" : "btn-outline-primary") btn-sm mx-1"
                 @onclick='() => GoToPage(pageNum)'>@pageNum</button>
             }
         </div>

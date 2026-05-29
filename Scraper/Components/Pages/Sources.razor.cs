@@ -13,18 +13,15 @@ public partial class Sources : IDisposable
     private bool isSaving;
     private SourceModel model = new();
 
-    private int currentPage = 1;
     private int totalPages = 1;
-    private const int PageSize = 10;
-
-    private string sortColumn = "Name";
-    private bool sortDescending;
+    private PagingParams PagingParams = new PagingParams { SortBy = nameof(SourceDto.Name) };
 
     private string nameFilter = "";
     private string linkFilter = "";
 
     private CancellationTokenSource? _debounce;
     private const int DebounceMs = 300;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,39 +30,35 @@ public partial class Sources : IDisposable
 
     private async Task FetchDataAsync()
     {
-        currentPage = 1;
         var result = await SourceService.GetFilteredAsync(
-            page: currentPage,
-            pageSize: PageSize,
+            PagingParams: PagingParams,
             nameFilter: string.IsNullOrWhiteSpace(nameFilter) ? null : nameFilter,
-            linkFilter: string.IsNullOrWhiteSpace(linkFilter) ? null : linkFilter,
-            sortBy: sortColumn,
-            sortDescending: sortDescending);
+            linkFilter: string.IsNullOrWhiteSpace(linkFilter) ? null : linkFilter
+            );
 
         sources = result.Items;
         totalPages = result.TotalPages;
-        currentPage = result.Page;
 
     }
 
     private async Task OnSortClicked(string column)
     {
-        if (sortColumn == column)
+        if (PagingParams.SortBy == column)
         {
-            sortDescending = !sortDescending;
+            PagingParams.SortDescending = !PagingParams.SortDescending;
         }
         else
         {
-            sortColumn = column;
-            sortDescending = false;
+            PagingParams.SortBy = column;
+            PagingParams.SortDescending = false;
         }
         await FetchDataAsync();
     }
 
     private string SortIcon(string column)
     {
-        if (sortColumn != column) return "";
-        return sortDescending ? "bi-arrow-down" : "bi-arrow-up";
+        if (PagingParams.SortBy != column) return "";
+        return PagingParams.SortDescending ? "bi-arrow-down" : "bi-arrow-up";
     }
 
     private async Task OnNameSearchChanged(ChangeEventArgs e)
@@ -83,15 +76,14 @@ public partial class Sources : IDisposable
     private async Task GoToPage(int page)
     {
         if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        var result = await SourceService.GetFilteredAsync(page: currentPage, pageSize: PageSize,
+        PagingParams.Page = page;
+        var result = await SourceService.GetFilteredAsync(PagingParams: PagingParams,
             nameFilter: string.IsNullOrWhiteSpace(nameFilter) ? null : nameFilter,
-            linkFilter: string.IsNullOrWhiteSpace(linkFilter) ? null : linkFilter,
-            sortBy: sortColumn,
-            sortDescending: sortDescending);
+            linkFilter: string.IsNullOrWhiteSpace(linkFilter) ? null : linkFilter);
+
         sources = result.Items;
         totalPages = result.TotalPages;
-        currentPage = result.Page;
+        PagingParams.Page = result.Page;
     }
 
     private async Task DebouncedFetchAsync()
