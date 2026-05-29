@@ -13,13 +13,12 @@ public class SourceService
     public SourceService(IDbContextFactory<AppDbContext> factory) => _factory = factory;
 
     public async Task<PaginatedResponse<SourceDto>> GetFilteredAsync(
-        int page = 1,
-        int pageSize = 10,
+        PagingParams PagingParams,
         string? nameFilter = null,
-        string? linkFilter = null,
-        string sortBy = "Name",
-        bool sortDescending = false)
+        string? linkFilter = null
+        )
     {
+
         await using var db = await _factory.CreateDbContextAsync();
         var query = db.Sources.AsNoTracking();
 
@@ -28,18 +27,18 @@ public class SourceService
 
         var total = await query.CountAsync();
 
-        if (sortDescending)
+        if (PagingParams.SortDescending)
         {
-            query = query.OrderByDescending(sortBy);
+            query = query.OrderByDescending(PagingParams.SortBy);
         }
         else
         {
-            query = query.OrderBy(sortBy);
+            query = query.OrderBy(PagingParams.SortBy);
         }
 
         var items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
+            .Skip((PagingParams.Page - 1) * PagingParams.PageSize)
+            .Take(PagingParams.PageSize)
             .Select(s => new SourceDto { Id = s.Id, Name = s.Name, Link = s.Link })
             .ToListAsync();
 
@@ -47,8 +46,8 @@ public class SourceService
         {
             Items = items,
             TotalCount = total,
-            Page = page,
-            PageSize = pageSize
+            Page = PagingParams.Page,
+            PageSize = PagingParams.PageSize
         };
     }
 

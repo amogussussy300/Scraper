@@ -53,7 +53,7 @@
             @for (int p = 1; p <= totalPages; p++)
             {
                 var pageNum = p;
-                <button class="btn @(pageNum == currentPage ? "btn-primary" : "btn-outline-primary") btn-sm mx-1"
+                <button class="btn @(pageNum == PagingParams.Page ? "btn-primary" : "btn-outline-primary") btn-sm mx-1"
                 @onclick='() => GoToPage(pageNum)'>@pageNum</button>
             }
         </div>
