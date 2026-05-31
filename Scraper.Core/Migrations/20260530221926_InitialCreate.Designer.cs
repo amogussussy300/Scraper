@@ -11,7 +11,7 @@ using Scraper.Core.Data;
 namespace Scraper.Core.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260505204932_InitialCreate")]
+    [Migration("20260530221926_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

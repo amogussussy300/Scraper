@@ -1,6 +1,7 @@
-﻿@using Scraper.Core.Dtos
-
-@if (visible && detail != null)
+﻿@using Scraper.Core
+@using Scraper.Core.Dtos
+@using Scraper.Core.Enums
+@if (visible && local != null)
 {
     <div class="modal-backdrop fade show"></div>
     <div class="modal fade show d-block" tabindex="-1" role="dialog" style="overflow-y:auto;">
@@ -8,24 +9,27 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title d-flex align-items-center gap-2">
-                        <span>Edit Action: @detail.ActionType,</span>
-                        <input class="form-control form-control-sm"
-                               style="width: 250px;"
-                               placeholder="Target (e.g. Price)"
-                               @bind="detail.Target" />
+                        <span>Edit Action: @local.ActionType,</span>
+                        <select class="form-select form-select-sm" style="width: 250px;"
+                                @bind="local.FieldName">
+                            <option value="">-- field --</option>
+                            @foreach (var f in TempFields.All)
+                            {
+                                <option value="@f">@f</option>
+                            }
+                        </select>
                         <span>: String</span>
                     </h5>
                     <button type="button" class="btn-close" @onclick="OnCancelClicked"
-                            disabled="@(isTesting || isSaving)"></button>
+                            disabled="@isTesting"></button>
                 </div>
-
                 <div class="modal-body">
                     <div class="mb-3">
-                        @if (detail.Actions.Count == 0)
+                        @if (local.ExtractRules.Count == 0)
                         {
                             <div class="text-muted small mb-2">No selectors yet — click Add</div>
                         }
-                        @for (int i = 0; i < detail.Actions.Count; i++)
+                        @for (int i = 0; i < local.ExtractRules.Count; i++)
                         {
                             var idx = i;
                             <div class="d-flex gap-2 mb-2 align-items-center">
@@ -35,30 +39,32 @@
                                 </select>
                                 <input class="form-control"
                                        placeholder="e.g. .product .price"
-                                       @bind="detail.Actions[idx].Selector" />
+                                       @bind="local.ExtractRules[idx].Value" />
                                 <button type="button" class="btn btn-sm btn-outline-danger"
                                         @onclick="() => RemoveSelector(idx)"
-                                        disabled="@(isTesting || isSaving)">×</button>
+                                        disabled="@isTesting">
+                                    ×
+                                </button>
                             </div>
                         }
                         <button type="button" class="btn btn-sm btn-primary"
                                 @onclick="AddSelector"
-                                disabled="@(isTesting || isSaving)">+ Add</button>
+                                disabled="@isTesting">
+                            + Add
+                        </button>
                     </div>
-
                     <div class="d-flex justify-content-end gap-2 mb-2">
                         <button type="button" class="btn btn-outline-secondary btn-sm"
                                 @onclick="OnTestClicked"
-                                disabled="@(isTesting || isSaving)">
+                                disabled="@isTesting">
                             @(isTesting ? "Testing..." : "Test")
                         </button>
                         <button type="button" class="btn btn-success btn-sm"
                                 @onclick="OnSaveClicked"
-                                disabled="@(isTesting || isSaving)">
-                            @(isSaving ? "Saving..." : "Save")
+                                disabled="@isTesting">
+                            Save
                         </button>
                     </div>
-
                     <div class="row g-2">
                         <div class="col-md-6">
                             <label class="form-label small text-muted">Raw HTML</label>
@@ -87,7 +93,6 @@
                             </div>
                         </div>
                     </div>
-
                     @if (!string.IsNullOrEmpty(errorMessage))
                     {
                         <div class="alert alert-danger mt-2 mb-0 py-2 small">@errorMessage</div>
