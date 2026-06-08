@@ -12,6 +12,7 @@ public class PlaywrightService : IPlaywrightService
     private IPlaywright? _playwright;
     private IBrowser? _browser;
     private IBrowserContext? _context;
+    private IPage? _sharedPage;
     private readonly SemaphoreSlim _initLock = new(1, 1);
     private async Task<IBrowserContext> GetContextAsync()
     {
@@ -49,23 +50,25 @@ public class PlaywrightService : IPlaywrightService
     public async Task<string?> GetHtmlAsync(string url, CancellationToken ct = default)
     {
         var context = await GetContextAsync();
-        var page = await context.NewPageAsync();
+        _sharedPage ??= await context.NewPageAsync();
         try
         {
-            await page.GotoAsync(NormalizeUrl(url), new PageGotoOptions
+            await _sharedPage.GotoAsync(NormalizeUrl(url), new PageGotoOptions
             {
                 WaitUntil = WaitUntilState.DOMContentLoaded,
                 Timeout = 60_000
             });
-            return await page.ContentAsync();
+            ct.ThrowIfCancellationRequested();
+            return await _sharedPage.ContentAsync();
         }
-        finally
+        catch
         {
-            await page.CloseAsync();
+            return null;
         }
     }
     public async ValueTask DisposeAsync()
     {
+        if (_sharedPage is not null) await _sharedPage.CloseAsync();
         if (_context is not null) await _context.CloseAsync();
         if (_browser is not null) await _browser.CloseAsync();
         _playwright?.Dispose();

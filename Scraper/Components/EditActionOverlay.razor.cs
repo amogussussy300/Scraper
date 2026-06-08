@@ -20,6 +20,7 @@ public partial class EditActionOverlay
     private string? errorMessage;
     private bool visible;
     private int? loadedForIndex;
+    private CancellationTokenSource? _testCts;
     private const int HtmlPreviewLimit = 50_000;
     private string TruncatedHtml =>
         rawHtml.Length > HtmlPreviewLimit
@@ -66,9 +67,11 @@ public partial class EditActionOverlay
         }
         isTesting = true;
         errorMessage = null;
+        _testCts?.Cancel();
+        _testCts = new CancellationTokenSource();
         try
         {
-            var html = await PlaywrightService.GetHtmlAsync(PageUrl);
+            var html = await PlaywrightService.GetHtmlAsync(PageUrl, _testCts.Token);
             if (string.IsNullOrEmpty(html))
             {
                 errorMessage = "Failed to load HTML";
@@ -88,6 +91,10 @@ public partial class EditActionOverlay
             {
                 rawHtml = html;
             }
+        }
+        catch (OperationCanceledException)
+        {
+            return;
         }
         catch (Exception ex)
         {
@@ -111,6 +118,9 @@ public partial class EditActionOverlay
     }
     private async Task CloseAsync()
     {
+        _testCts?.Cancel();
+        _testCts?.Dispose();
+        _testCts = null;
         visible = false;
         local = null;
         rawHtml = "";

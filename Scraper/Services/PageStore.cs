@@ -8,6 +8,8 @@ public class PageStore
     private int _nextId = 1;
     public (int pageId, PageDto page) Create(int sourceId, string name, string url)
     {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required");
+        if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException("URL is required");
         lock (_lock)
         {
             var page = new PageDto { Name = name, Url = url };

@@ -10,14 +10,13 @@
                 <th style="width: 1%; white-space: nowrap;"></th>
                 <th>Name</th>
                 <th>Url</th>
-                <th style="width: 1%; white-space: nowrap;">Edit</th>
                 <th style="width: 1%; white-space: nowrap;">Delete</th>
             </tr>
         </thead>
         <tbody>
             @if (pages.Count == 0)
             {
-                <tr><td colspan="5" class="text-center text-muted">No pages yet</td></tr>
+                <tr><td colspan="4" class="text-center text-muted">No pages yet</td></tr>
             }
             else
             {
@@ -31,11 +30,6 @@
                         <td>@(page.Name)</td>
                         <td>@(page.Url)</td>
                         <td>
-                            <button class="btn btn-link p-0"
-                                    @onclick:stopPropagation="true"
-                                    @onclick="() => OnPageSelected.InvokeAsync(pid)">edit</button>
-                        </td>
-                        <td>
                             <button class="btn btn-danger btn-sm"
                                     @onclick:stopPropagation="true"
                                     @onclick="() => DeletePage(pid)">Delete</button>
@@ -44,27 +38,9 @@
                     @if (expandedPageId == pid)
                     {
                         <tr class="accordion-row">
-                            <td colspan="5" class="p-0">
-                                <div class="accordion-body bg-light border-top p-3">
-                                    <div class="row g-2 mb-2">
-                                        <div class="col-md-4">
-                                            <label class="form-label small text-muted">Name</label>
-                                            <input class="form-control form-control-sm"
-                                                   @bind="editingName" />
-                                        </div>
-                                        <div class="col-md-8">
-                                            <label class="form-label small text-muted">URL</label>
-                                            <input class="form-control form-control-sm"
-                                                   placeholder="https://example.com"
-                                                   @bind="editingUrl" />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-secondary btn-sm"
-                                                @onclick="CancelAccordion">Cancel</button>
-                                        <button class="btn btn-success btn-sm"
-                                                @onclick="() => SaveAccordion(pid)">Save</button>
-                                    </div>
+                            <td colspan="4" class="p-0">
+                                <div class="border-top p-3">
+                                    <EditPageOverlay PageId="pid" OnSaved="OnPageSaved" />
                                 </div>
                             </td>
                         </tr>

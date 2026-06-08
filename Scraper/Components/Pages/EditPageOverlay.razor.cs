@@ -12,7 +12,6 @@ namespace Scraper.Components.Pages;
 public partial class EditPageOverlay : ComponentBase
 {
     [Parameter] public int PageId { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback OnSaved { get; set; }
 
     [Inject] private PageStore Store { get; set; } = default!;
@@ -20,8 +19,6 @@ public partial class EditPageOverlay : ComponentBase
     [Inject] private ParsingService ParsingService { get; set; } = default!;
 
     private PageDto? working;
-    private bool visible;
-    private int? loadedForId;
 
     private int? selectedActionIndex;
     private ActionDto? selectedAction;
@@ -30,16 +27,17 @@ public partial class EditPageOverlay : ComponentBase
     private ActionType newActionType = ActionType.ExtractField;
     private string newActionFieldName = "";
 
-    private bool isReloading;
-
     private bool isPreviewOpen;
     private bool isPreviewLoading;
     private string? previewError;
-    private Dictionary<string, string> previewResults = new();
+    private Dictionary<string, List<string>> previewResults = new();
+
+    private IEnumerable<string> AvailableFields =>
+        TempFields.All.Where(f => working?.Actions.All(a => a.FieldName != f) == true);
 
     protected override void OnParametersSet()
     {
-        if (PageId != 0 && PageId != loadedForId)
+        if (PageId != 0)
         {
             var orig = Store.Get(PageId);
             if (orig != null)
@@ -51,25 +49,29 @@ public partial class EditPageOverlay : ComponentBase
             {
                 working = null;
             }
-            loadedForId = PageId;
-            visible = true;
         }
-        else if (PageId == 0)
+        else
         {
-            visible = false;
-            loadedForId = null;
             working = null;
+        }
+
+        if (!string.IsNullOrEmpty(newActionFieldName)
+            && working?.Actions.Any(a => a.FieldName == newActionFieldName) == true)
+        {
+            newActionFieldName = "";
         }
     }
 
     private void ConfirmCreateAction()
     {
         if (working == null || string.IsNullOrEmpty(newActionFieldName)) return;
+        if (working.Actions.Any(a => a.FieldName == newActionFieldName)) return;
         working.Actions.Add(new ActionDto
         {
             ActionType = newActionType,
             FieldName = newActionFieldName
         });
+        newActionFieldName = "";
     }
 
     private void OnEditActionClicked(int idx)
@@ -106,44 +108,18 @@ public partial class EditPageOverlay : ComponentBase
         isActionOverlayOpen = false;
     }
 
-    private async Task OnReloadActions()
+    private void OnReloadActions()
     {
         if (working == null || string.IsNullOrWhiteSpace(working.Url)) return;
-        isReloading = true;
-        try
-        {
-            Store.Update(PageId, working);
-        }
-        finally
-        {
-            isReloading = false;
-        }
+        Store.Update(PageId, working);
     }
 
     private async Task OnSaveClicked()
     {
         if (working == null) return;
+        if (string.IsNullOrWhiteSpace(working.Url)) return;
         Store.Update(PageId, working);
         await OnSaved.InvokeAsync();
-        await CloseAsync();
-    }
-
-    private async Task OnCancelClicked()
-    {
-        await CloseAsync();
-    }
-
-    private async Task CloseAsync()
-    {
-        visible = false;
-        working = null;
-        loadedForId = null;
-        selectedActionIndex = null;
-        selectedAction = null;
-        isActionOverlayOpen = false;
-        isReloading = false;
-        isPreviewOpen = false;
-        await OnClose.InvokeAsync();
     }
 
     private async Task OpenPreview()
@@ -185,9 +161,12 @@ public partial class EditPageOverlay : ComponentBase
                 if (selectors.Count == 0) continue;
 
                 var elements = ParsingService.Extract(html, selectors);
-                var firstValue = elements.FirstOrDefault()?.InnerText ?? "";
-                if (!string.IsNullOrEmpty(firstValue) && !previewResults.ContainsKey(action.FieldName))
-                    previewResults[action.FieldName] = firstValue;
+                var values = elements
+                    .Select(e => e.InnerText)
+                    .Where(v => !string.IsNullOrEmpty(v))
+                    .ToList();
+                if (values.Count > 0 && !previewResults.ContainsKey(action.FieldName))
+                    previewResults[action.FieldName] = values;
             }
         }
         catch (Exception ex)

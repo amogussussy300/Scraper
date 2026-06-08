@@ -15,12 +15,6 @@
             </div>
             <a href="/" class="btn btn-outline-secondary btn-sm">Back to sources</a>
         </div>
-        <PagesList SourceId="source.Id" OnPageSelected="OnPageSelected" />
-        @if (selectedPageId.HasValue)
-        {
-            <EditPageOverlay PageId="selectedPageId.Value"
-                             OnClose="() => selectedPageId = null"
-                             OnSaved="OnPageSaved" />
-        }
+        <PagesList SourceId="source.Id" />
     }
 </div>
