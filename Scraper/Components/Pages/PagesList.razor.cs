@@ -12,6 +12,9 @@ public partial class PagesList : ComponentBase
     private bool isCreateOpen;
     private string newName = "";
     private string newUrl = "";
+    private int? expandedPageId;
+    private string editingName = "";
+    private string editingUrl = "";
     protected override void OnParametersSet()
     {
         Reload();
@@ -34,6 +37,38 @@ public partial class PagesList : ComponentBase
     private void DeletePage(int pid)
     {
         Store.Delete(pid);
+        if (expandedPageId == pid) expandedPageId = null;
+        Reload();
+    }
+    private void ToggleAccordion(int pid)
+    {
+        if (expandedPageId == pid)
+        {
+            expandedPageId = null;
+        }
+        else
+        {
+            var existing = Store.Get(pid);
+            if (existing != null)
+            {
+                editingName = existing.Name;
+                editingUrl = existing.Url;
+            }
+            expandedPageId = pid;
+        }
+    }
+    private void CancelAccordion()
+    {
+        expandedPageId = null;
+    }
+    private void SaveAccordion(int pid)
+    {
+        if (string.IsNullOrWhiteSpace(editingName) || string.IsNullOrWhiteSpace(editingUrl)) return;
+        var existing = Store.Get(pid);
+        if (existing == null) return;
+        existing.Name = editingName.Trim();
+        existing.Url = editingUrl.Trim();
+        expandedPageId = null;
         Reload();
     }
 }

@@ -1,0 +1,4 @@
+fixed ui: accordion for name, link in pages; preview for parsed text; edit and delete placement; reload button for actions
+
+tests: added 16 tests for parsing service
+

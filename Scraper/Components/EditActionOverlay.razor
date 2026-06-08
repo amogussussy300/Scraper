@@ -10,14 +10,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title d-flex align-items-center gap-2">
                         <span>Edit Action: @local.ActionType,</span>
-                        <select class="form-select form-select-sm" style="width: 250px;"
-                                @bind="local.FieldName">
-                            <option value="">-- field --</option>
-                            @foreach (var f in TempFields.All)
-                            {
-                                <option value="@f">@f</option>
-                            }
-                        </select>
+                        <span class="badge bg-secondary">@local.FieldName</span>
                         <span>: String</span>
                     </h5>
                     <button type="button" class="btn-close" @onclick="OnCancelClicked"
