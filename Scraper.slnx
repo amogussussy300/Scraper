@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="Scraper.Core/Scraper.Core.csproj" />
+  <Project Path="Scraper.Parsing/Scraper.Parsing.csproj" Id="e9547bd9-f7f2-4150-b95f-8a65fe635350" />
   <Project Path="Scraper/Scraper.csproj" />
+  <Project Path="Scraper.Tests/Scraper.Tests.csproj" />
 </Solution>

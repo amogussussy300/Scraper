@@ -1,6 +1,5 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@using Scraper.Models
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-end mb-3">
@@ -41,6 +40,8 @@
                     <tr>
                         <td>@s.Name</td>
                         <td>@s.Link</td>
+                        <td><a href="@($"/Sources/{s.Id}")">edit</a></td>
+                        <td><button type="button" class="btn btn-danger" @onclick="() => OnDeleteClicked(s.Id)">Delete</button></td>
                     </tr>
                 }
             }

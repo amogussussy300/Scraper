@@ -1,0 +1,97 @@
+﻿@using Scraper.Core
+@using Scraper.Core.Dtos
+@using Scraper.Core.Enums
+@if (visible && local != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" style="overflow-y:auto;">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title d-flex align-items-center gap-2">
+                        <span>Edit Action: @local.ActionType,</span>
+                        <span class="badge bg-secondary">@local.FieldName</span>
+                        <span>: String</span>
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="OnCancelClicked"
+                            disabled="@isTesting"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        @if (local.ExtractRules.Count == 0)
+                        {
+                            <div class="text-muted small mb-2">No selectors yet — click Add</div>
+                        }
+                        @for (int i = 0; i < local.ExtractRules.Count; i++)
+                        {
+                            var idx = i;
+                            <div class="d-flex gap-2 mb-2 align-items-center">
+                                <span class="badge bg-secondary">@(idx + 1)</span>
+                                <select class="form-select" style="width: 180px;" disabled>
+                                    <option selected>CssSelector</option>
+                                </select>
+                                <input class="form-control"
+                                       placeholder="e.g. .product .price"
+                                       @bind="local.ExtractRules[idx].Value" />
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        @onclick="() => RemoveSelector(idx)"
+                                        disabled="@isTesting">
+                                    ×
+                                </button>
+                            </div>
+                        }
+                        <button type="button" class="btn btn-sm btn-primary"
+                                @onclick="AddSelector"
+                                disabled="@isTesting">
+                            + Add
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                @onclick="OnTestClicked"
+                                disabled="@isTesting">
+                            @(isTesting ? "Testing..." : "Test")
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm"
+                                @onclick="OnSaveClicked"
+                                disabled="@isTesting">
+                            Save
+                        </button>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">Raw HTML</label>
+                            <pre class="border rounded p-2 bg-light"
+                                 style="height: 400px; overflow: auto; font-size: 11px; white-space: pre-wrap;">@TruncatedHtml</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">
+                                Preview (@previewValues.Count value(s))
+                            </label>
+                            <div class="border rounded p-2 bg-white"
+                                 style="height: 400px; overflow: auto;">
+                                @if (previewValues.Count == 0)
+                                {
+                                    <div class="text-muted small">No values yet — click Test</div>
+                                }
+                                else
+                                {
+                                    <ol class="mb-0 small">
+                                        @foreach (var v in previewValues)
+                                        {
+                                            <li>@v</li>
+                                        }
+                                    </ol>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-2 mb-0 py-2 small">@errorMessage</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

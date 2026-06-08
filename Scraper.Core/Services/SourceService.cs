@@ -60,4 +60,27 @@ public class SourceService
         return new SourceDto { Id = entity.Id, Name = entity.Name, Link = entity.Link };
     }
 
+    public async Task DeleteAsync(int Id)
+    {
+        await using var db = await _factory.CreateDbContextAsync();
+
+        await db.Sources.Where(s => s.Id == Id).ExecuteDeleteAsync();
+
+    }
+
+    public async Task<SourceDto?> GetByIdAsync(int id)
+    {
+        await using var db = await _factory.CreateDbContextAsync();
+        var entity = await db.Sources.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+
+        if (entity == null) return null;
+
+        return new SourceDto
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Link = entity.Link
+        };
+    }
+
 }

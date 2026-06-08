@@ -1,6 +1,9 @@
 # local environment data
 .env
 
+# testhtmlfiles
+Scraper.Tests/testHtml_files/
+
 # local dev config
 **/appsettings.Development.json
 

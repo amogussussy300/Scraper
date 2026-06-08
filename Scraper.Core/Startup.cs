@@ -3,16 +3,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scraper.Core.Data;
 using Scraper.Core.Services;
+namespace Scraper.Core;
 
-namespace Scraper.Core
+public static class Startup
 {
-    public static class Startup
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("ScraperDb")));
-
-            services.AddScoped<SourceService>();
-        }
+        services.AddDbContextFactory<AppDbContext>(opt =>
+            opt.UseNpgsql(configuration.GetConnectionString("ScraperDb")));
+        services.AddScoped<SourceService>();
     }
 }

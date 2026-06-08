@@ -107,6 +107,25 @@ public partial class Sources : IDisposable
         isModalOpen = true;
     }
 
+    private bool isDeleting;
+
+    private async Task OnDeleteClicked(int Id)
+    {
+        if (isDeleting) return;
+        isDeleting = true;
+
+        try
+        {
+            await SourceService.DeleteAsync(Id);
+            await FetchDataAsync();
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+
+    }
+
     private void CloseModal()
     {
         isModalOpen = false;
